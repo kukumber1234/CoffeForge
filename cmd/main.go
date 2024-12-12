@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"hot-coffee/internal/dal"
 	"hot-coffee/internal/service"
@@ -18,7 +19,7 @@ import (
 )
 
 const (
-	host     = "PSQL Local"
+	host     = "db"
 	port     = 5432
 	user     = "latte"
 	password = "latte"
@@ -35,21 +36,20 @@ func main() {
 
 	dal.Create()
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 
-	db, err := sql.Open("latte", psqlInfo)
+	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
-
+	time.Sleep(5 * time.Second)
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
-
+	log.Println("Connected")
 	mux := http.NewServeMux()
 
 	// menu
