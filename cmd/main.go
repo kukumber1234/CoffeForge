@@ -1,7 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -10,7 +12,17 @@ import (
 
 	"hot-coffee/internal/handler"
 
+	_ "github.com/lib/pq"
+
 	flags "hot-coffee/models"
+)
+
+const (
+	host     = "PSQL Local"
+	port     = 5432
+	user     = "latte"
+	password = "latte"
+	dbname   = "frappuccino"
 )
 
 func main() {
@@ -22,6 +34,21 @@ func main() {
 	}
 
 	dal.Create()
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
+	db, err := sql.Open("latte", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
 
 	mux := http.NewServeMux()
 
